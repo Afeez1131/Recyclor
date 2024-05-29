@@ -1,0 +1,11 @@
+local_settings.py
+.venv
+*.log
+.idea
+.idea/*
+.env
+**/__pycache__/*
+*/migrations/0*
+**.pyc
+**/*.pyc
+db.sqlite3
