@@ -8,3 +8,5 @@ class PermissionTable(models.Model):
             ("c_admin", "Administrator"),
             ("c_customer", "Customer"),
         )
+        
+        
