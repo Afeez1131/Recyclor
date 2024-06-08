@@ -1,6 +1,7 @@
 from decimal import Decimal
 import re
 
+
 def intcomma(value):
     """
     Convert an integer to a string containing commas every three digits.
@@ -15,8 +16,8 @@ def intcomma(value):
         prefix_with_commas = re.sub(r"^(-?),", r"\1", prefix_with_commas)
         result = prefix_with_commas + result[len(prefix) :]
     return result
-    
-    
+
+
 print(intcomma(3000.00))
 print(intcomma(45000000.00))
 print(intcomma(113500.0))

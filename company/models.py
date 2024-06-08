@@ -12,20 +12,21 @@ class Company(models.Model):
     description = models.TextField()
     website = models.URLField()
     established_date = models.DateField()
-    
+
     def clean(self):
         super().clean()
         value = self.established_date
         if isinstance(value, str):
             try:
-                value = timezone.datetime.strptime(value, '%Y-%m-%d').date()
+                value = timezone.datetime.strptime(value, "%Y-%m-%d").date()
             except ValueError:
-                raise ValidationError({"established_date": "Invalid established date provided"})
-        if value >= timezone.now().date():
-            raise ValidationError({"established_data": "Established data cannot be greater than today"})
-        
-    
-    
+                raise ValidationError(
+                    {"established_date": "Invalid established date provided"}
+                )
+        if value and value >= timezone.now().date():
+            raise ValidationError(
+                {"established_data": "Established data cannot be greater than today"}
+            )
+
     def __str__(self):
         return str(self.name)
-    
