@@ -27,6 +27,24 @@ class RegisterForm(forms.Form):
         widget=forms.PasswordInput(attrs={"class": "form-control"}),
     )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email", "")
+        password1 = cleaned_data.get("password1", "")
+        password2 = cleaned_data.get("password2", "")
+        if email and User.objects.filter(email=email).exists():
+            self.add_error("email", "User with this email exists")
+        if not password1 or not password2:
+            self.add_error("password1", "Password is required")
+            self.add_error("password2", "Password is required")
+        if password1 != password2:
+            self.add_error("password1", "Passwords do not match")
+            self.add_error("password2", "Passwords do not match")
+        try:
+            validate_password(password1)
+        except forms.ValidationError as errs:
+            raise forms.ValidationError({"password1": errs.messages})
+        return cleaned_data
         
     def save(self):
         try:
@@ -54,23 +72,5 @@ class RegisterForm(forms.Form):
         except Exception as e:
             return {'status': 'error', 'info': f'Error occured {str(e)}'}
             
-    def clean(self):
-        cleaned_data = super().clean()
-        email = cleaned_data.get("email", "")
-        password1 = cleaned_data.get("password1", "")
-        password2 = cleaned_data.get("password2", "")
-        if email and User.objects.filter(email=email).exists():
-            self.add_error("email", "User with this email exists")
-        if not password1 or not password2:
-            self.add_error("password1", "Password is required")
-            self.add_error("password2", "Password is required")
-        if password1 != password2:
-            self.add_error("password1", "Passwords do not match")
-            self.add_error("password2", "Passwords do not match")
-        try:
-            validate_password(password1)
-        except forms.ValidationError as errs:
-            raise forms.ValidationError({"password1": errs.messages})
-        
-        return cleaned_data
+    
         
