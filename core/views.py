@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 
 # Create your views here.
 
+
 class DashboardView(BracesLoginRequiredMixin, TemplateView):
     template_name = "core/dashboard.html"
 

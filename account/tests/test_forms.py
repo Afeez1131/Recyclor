@@ -12,7 +12,7 @@ class RegistrationFormTestCase(TestCase):
             "full_name": "Recyclor",
             "email": "mail@gmail.com",
             "password1": "testpass123",
-            "password2": "testpass123"
+            "password2": "testpass123",
         }
 
     def test_registration_form_is_valid(self):
@@ -48,7 +48,7 @@ class RegistrationFormTestCase(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("email", form.errors.keys())
         self.assertIn("Enter a valid email address.", form.errors.get("email"))
-        
+
     def test_registration_form_with_existing_mail(self):
         User.objects.create_user(
             username="testing", password="123445", email="email@gmail.com"
@@ -58,32 +58,32 @@ class RegistrationFormTestCase(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("email", form.errors.keys())
         self.assertIn("User with this email exists", form.errors.get("email"))
-        
+
     def test_registration_form_without_password(self):
         self.data.pop("password1", None)
-        self.data.pop("password2", None)  
+        self.data.pop("password2", None)
         form = RegisterForm(self.data)
         self.assertFalse(form.is_valid())
         self.assertIn("password1", form.errors.keys())
         self.assertIn("password2", form.errors.keys())
         self.assertIn("Password is required", form.errors.get("password1"))
         self.assertIn("Password is required", form.errors.get("password2"))
-        
+
     def test_registration_form_with_password_mismatch(self):
         self.data.update({"password2": "testpass1234"})
         form = RegisterForm(self.data)
         self.assertFalse(form.is_valid())
         self.assertIn("password1", form.errors.keys())
         self.assertIn("password2", form.errors.keys())
-        self.assertIn("Passwords do not match", form.errors.get("password1"))        
+        self.assertIn("Passwords do not match", form.errors.get("password1"))
         self.assertIn("Passwords do not match", form.errors.get("password2"))
-        
+
     def test_registration_form_with_invalid_password(self):
         self.data.update({"password1": "password", "password2": "password"})
         form = RegisterForm(self.data)
         self.assertFalse(form.is_valid())
         self.assertIn("password1", form.errors.keys())
-        self.assertIn("This password is too common.", form.errors.get('password1'))
+        self.assertIn("This password is too common.", form.errors.get("password1"))
 
     def test_registration_form_save_with_valid_data(self):
         form = RegisterForm(self.data)

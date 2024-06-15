@@ -32,7 +32,7 @@ class CreateServiceHistory(forms.ModelForm):
         widgets = {
             "cost": forms.NumberInput(attrs={"class": "form-control"}),
         }
-        
+
     def clean(self):
         cleaned_data = super().clean()
         cost = cleaned_data.get("cost", 0)

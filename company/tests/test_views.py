@@ -57,13 +57,11 @@ class TestCreateCompanyViews(TestCase):
         response = self.client.delete(reverse("company:create_company"))
         self.assertEqual(response.status_code, 405)
         self.assertIsInstance(response, HttpResponseNotAllowed)
-        
+
     def test_company_create(self):
         self.client.login(**self.user)
         response = self.client.post(
-            reverse("company:create_company"), 
-            data=self.company_data, 
-            follow=True
+            reverse("company:create_company"), data=self.company_data, follow=True
         )
         # if i am not following the rediection, then the response would be a 302
         # but, there would not be a way to access the context of the response
@@ -71,25 +69,32 @@ class TestCreateCompanyViews(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertRedirects(response, reverse("core:dashboard"))
         self.assertTrue(Company.objects.filter(name=self.company_data["name"]).exists())
-        
+
     def test_company_create_success_message(self):
         self.client.login(**self.user)
-        response = self.client.post(reverse("company:create_company"), data=self.company_data, follow=True)
+        response = self.client.post(
+            reverse("company:create_company"), data=self.company_data, follow=True
+        )
         self.assertEqual(response.status_code, 200)
         self.assertRedirects(response, reverse("core:dashboard"))
         messages = list(response.context.get("messages", []))
         self.assertEqual(len(messages), 1)
         message = messages[0]
-        self.assertEqual(str(message), f"{self.company_data.get('name')} has been created successfully")
-        
+        self.assertEqual(
+            str(message),
+            f"{self.company_data.get('name')} has been created successfully",
+        )
+
     def test_company_create_invalid_data(self):
         self.client.login(**self.user)
         self.company_data.update({"name": "", "email": "hello.com"})
-        response = self.client.post(reverse("company:create_company"), data=self.company_data)
+        response = self.client.post(
+            reverse("company:create_company"), data=self.company_data
+        )
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, "form", "name", "This field is required.")
         self.assertFormError(response, "form", "email", "Enter a valid email address.")
-        
+
     def test_company_create_context(self):
         self.client.login(**self.user)
         response = self.client.get(reverse("company:create_company"))
@@ -98,7 +103,8 @@ class TestCreateCompanyViews(TestCase):
         self.assertEqual(response.context["title"], "Create Company")
         self.assertIsInstance(response.context["form"], CompanyCreateForm)
         # self.assertEqual(response.context.get("form_class"), CompanyCreateForm)
-        # 
+        #
+
     def test_company_create_invalid_context(self):
         self.client.login(**self.user)
         response = self.client.get(reverse("company:create_company"))
@@ -122,7 +128,9 @@ class CompanyUpdateTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(
             response,
-            reverse("account:login") + "?next=" + reverse("company:update_company", args=[self.company.id]),
+            reverse("account:login")
+            + "?next="
+            + reverse("company:update_company", args=[self.company.id]),
         )
 
     def test_company_update_authenticated(self):
@@ -136,14 +144,16 @@ class CompanyUpdateTestCase(TestCase):
 
     def test_company_update(self):
         self.client.login(**self.user)
-        self.company_data.update({
-            "name": "Updated Company Name",
-            "email": "update@mail.com",
-            "address": "Updated Address",
-        })
+        self.company_data.update(
+            {
+                "name": "Updated Company Name",
+                "email": "update@mail.com",
+                "address": "Updated Address",
+            }
+        )
         response = self.client.post(
             reverse("company:update_company", args=[self.company.id]),
-            data=self.company_data
+            data=self.company_data,
         )
         self.company.refresh_from_db()
         self.assertEqual(response.status_code, 302)
@@ -151,19 +161,18 @@ class CompanyUpdateTestCase(TestCase):
         self.assertEqual(self.company.name, "Updated Company Name")
         self.assertEqual(self.company.email, "update@mail.com")
         self.assertEqual(self.company.address, "Updated Address")
-        
+
     def test_company_update_invalid_data(self):
         self.client.login(**self.user)
-        self.company_data.update({
-            "email": "invalid",
-            "website": "invalid@mail"
-        })
-        response = self.client.post(reverse("company:update_company", args=[self.company.id]),data=self.company_data)
+        self.company_data.update({"email": "invalid", "website": "invalid@mail"})
+        response = self.client.post(
+            reverse("company:update_company", args=[self.company.id]),
+            data=self.company_data,
+        )
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, "form", "email", "Enter a valid email address.")
         self.assertFormError(response, "form", "website", "Enter a valid URL.")
-        
-        
+
     def test_company_update_invalid_methods(self):
         self.client.login(**self.user)
         response = self.client.delete(
@@ -171,39 +180,46 @@ class CompanyUpdateTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 405)
         self.assertIsInstance(response, HttpResponseNotAllowed)
-        
+
     def test_company_update_invalid_instance(self):
         self.client.login(**self.user)
         response = self.client.get(reverse("company:update_company", args=[100]))
         self.assertEqual(response.status_code, 404)
-        
+
     def test_company_update_success_message(self):
         self.client.login(**self.user)
-        self.company_data.update({
-            "name": "Updated Company Name",
-            "email": "updated@mail.com"
-            })
-        response = self.client.post(reverse("company:update_company", args=[self.company.id]), data=self.company_data, follow=True)
+        self.company_data.update(
+            {"name": "Updated Company Name", "email": "updated@mail.com"}
+        )
+        response = self.client.post(
+            reverse("company:update_company", args=[self.company.id]),
+            data=self.company_data,
+            follow=True,
+        )
         self.assertEqual(response.status_code, 200)
         self.assertRedirects(response, reverse("core:dashboard"))
         messages = list(response.context.get("messages", []))
         self.assertEqual(len(messages), 1)
         message = str(messages[0])
-        self.assertEqual(message, f"{self.company_data.get('name')} has been updated successfully")
-        
+        self.assertEqual(
+            message, f"{self.company_data.get('name')} has been updated successfully"
+        )
+
     def test_company_update_context(self):
         self.client.login(**self.user)
-        response = self.client.get(reverse("company:update_company", args=[self.company.id]))
+        response = self.client.get(
+            reverse("company:update_company", args=[self.company.id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertIn("form", response.context)
         self.assertIn("title", response.context)
         self.assertIsInstance(response.context.get("form"), CompanyCreateForm)
-        
+
     def test_company_update_invalid_context(self):
         self.client.login(**self.user)
-        response = self.client.get(reverse("company:update_company", args=[self.company.id]))
+        response = self.client.get(
+            reverse("company:update_company", args=[self.company.id])
+        )
         self.assertEqual(response.status_code, 200)
         self.assertNotIn("invalidform", response.context)
         self.assertNotIn("invalidtitle", response.context)
-        
-    

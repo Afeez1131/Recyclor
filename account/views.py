@@ -13,7 +13,7 @@ from account.forms import RegisterForm
 
 def login_user(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('core:dashboard'))
+        return HttpResponseRedirect(reverse("core:dashboard"))
     next = request.GET.get("next", "")
     if request.method == "POST":
         username = request.POST.get("username", "")
@@ -27,6 +27,7 @@ def login_user(request):
         else:
             messages.error(request, "Invalid username or password.")
     return render(request, "account/login.html")
+
 
 def logout_user(request):
     logout(request)
@@ -51,10 +52,8 @@ class RegisterUserView(FormView):
         else:
             messages.error(self.request, "Invalid form")
             return super().form_invalid(form)
-        
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Registration Page"
         return context
-
-

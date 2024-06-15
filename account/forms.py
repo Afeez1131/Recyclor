@@ -45,32 +45,34 @@ class RegisterForm(forms.Form):
         except forms.ValidationError as errs:
             raise forms.ValidationError({"password1": errs.messages})
         return cleaned_data
-        
+
     def save(self):
         try:
             # cleaned_data = self.cleaned_data
-            full_name = self.cleaned_data.get('name', '')
-            email = self.cleaned_data.get('email', '')
-            password = self.cleaned_data.get('password1', '')
-            name_split = full_name.split(' ')
-            first_name = ''
-            last_name = ''
+            full_name = self.cleaned_data.get("name", "")
+            email = self.cleaned_data.get("email", "")
+            password = self.cleaned_data.get("password1", "")
+            name_split = full_name.split(" ")
+            first_name = ""
+            last_name = ""
             if len(name_split) == 1:
                 first_name = name_split[0]
             elif len(name_split) == 2:
                 first_name, last_name = name_split
             else:
                 first_name = name_split[0]
-                last_name = ' '.join(name_split[1:])
+                last_name = " ".join(name_split[1:])
             user = User.objects.create_user(
-                username=email, 
-                email=email, 
+                username=email,
+                email=email,
                 password=password,
                 first_name=first_name,
-                last_name=last_name)
-            return {'status': 'success', 'info': 'User created succcessfully', 'user': user}
+                last_name=last_name,
+            )
+            return {
+                "status": "success",
+                "info": "User created succcessfully",
+                "user": user,
+            }
         except Exception as e:
-            return {'status': 'error', 'info': f'Error occured {str(e)}'}
-            
-    
-        
+            return {"status": "error", "info": f"Error occured {str(e)}"}
